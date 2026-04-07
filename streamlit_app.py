@@ -16,8 +16,9 @@ model = load_model()
 # ---------- CSS ----------
 st.markdown("""
 <style>
+/* ---------- BACKGROUND ---------- */
 [data-testid="stAppViewContainer"] {
-    background: linear-gradient(135deg, #1a0f2e, #2a1b4d, #102542);
+    background: linear-gradient(135deg, #0b1020, #16213e, #1b2a49);
     background-attachment: fixed;
 }
 
@@ -25,59 +26,123 @@ st.markdown("""
     background: rgba(0,0,0,0);
 }
 
-/* FULL PAGE INTRO */
-@keyframes splash {
+/* ---------- FULL SCREEN INTRO ---------- */
+@keyframes fadeOut {
     0% {opacity: 1;}
     80% {opacity: 1;}
     100% {opacity: 0; visibility: hidden;}
 }
 
+@keyframes glowPulse {
+    0% {
+        opacity: 0;
+        transform: scale(0.88);
+        text-shadow: 0 0 0px rgba(56, 189, 248, 0.0);
+    }
+    30% {
+        opacity: 1;
+        transform: scale(1.02);
+        text-shadow: 0 0 12px rgba(56, 189, 248, 0.6),
+                     0 0 24px rgba(56, 189, 248, 0.5);
+    }
+    60% {
+        opacity: 1;
+        transform: scale(1.06);
+        text-shadow: 0 0 24px rgba(56, 189, 248, 0.9),
+                     0 0 50px rgba(56, 189, 248, 0.8),
+                     0 0 80px rgba(124, 58, 237, 0.55);
+    }
+    100% {
+        opacity: 1;
+        transform: scale(1);
+        text-shadow: 0 0 14px rgba(56, 189, 248, 0.7),
+                     0 0 28px rgba(124, 58, 237, 0.35);
+    }
+}
+
+@keyframes subtitleRise {
+    0% {
+        opacity: 0;
+        transform: translateY(25px);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
 .intro {
     position: fixed;
     inset: 0;
-    backdrop-filter: blur(18px);
-    background: rgba(0, 0, 0, 0.25);
+    backdrop-filter: blur(22px);
+    background: rgba(2, 6, 23, 0.58);
     display: flex;
     align-items: center;
     justify-content: center;
     z-index: 9999;
-    animation: splash 3.5s forwards;
+    animation: fadeOut 3.8s forwards;
+}
+
+.intro-box {
+    text-align: center;
+    padding: 2rem 2.5rem;
+    border-radius: 26px;
+    background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(255,255,255,0.12);
+    box-shadow: 0 18px 48px rgba(0,0,0,0.35);
 }
 
 .intro-text {
-    font-size: 3rem;
-    font-weight: bold;
+    font-size: 3.1rem;
+    font-weight: 800;
     color: white;
-    text-align: center;
-    padding: 1.2rem 2rem;
-    border-radius: 24px;
-    background: rgba(255,255,255,0.08);
-    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+    letter-spacing: 1px;
+    animation: glowPulse 2.2s ease-in-out;
 }
 
-/* MAIN UI */
+.intro-sub {
+    margin-top: 0.7rem;
+    color: #dbeafe;
+    font-size: 1.05rem;
+    animation: subtitleRise 1.2s ease-in-out;
+}
+
+/* ---------- MAIN UI ---------- */
+.main-title {
+    font-size: 2.5rem;
+    font-weight: 800;
+    color: white;
+    margin-bottom: 0.2rem;
+}
+
+.main-subtitle {
+    color: #dbeafe;
+    margin-bottom: 1.5rem;
+}
+
 .glass-card {
     background: rgba(255,255,255,0.08);
     padding: 2rem;
-    border-radius: 20px;
-    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 22px;
+    border: 1px solid rgba(255,255,255,0.09);
+    box-shadow: 0 10px 32px rgba(0,0,0,0.22);
     margin-bottom: 1rem;
 }
 
 .metric {
     background: rgba(255,255,255,0.06);
     padding: 1rem;
-    border-radius: 15px;
+    border-radius: 16px;
     text-align: center;
     color: white;
-    margin-bottom: 10px;
-    border: 1px solid rgba(255,255,255,0.05);
+    margin-bottom: 0.8rem;
+    border: 1px solid rgba(255,255,255,0.06);
 }
 
 .metric-value {
     font-size: 1.7rem;
-    color: #38bdf8;
-    font-weight: bold;
+    color: #67e8f9;
+    font-weight: 700;
     margin-top: 0.25rem;
 }
 
@@ -85,21 +150,19 @@ st.markdown("""
 .stDownloadButton>button,
 div[data-testid="stFormSubmitButton"] button {
     width: 100%;
-    background: linear-gradient(90deg,#7c3aed,#06b6d4);
+    background: linear-gradient(90deg, #7c3aed, #06b6d4);
     color: white;
-    font-weight: bold;
-    border-radius: 12px;
+    font-weight: 700;
+    border-radius: 14px;
     border: none;
-    padding: 0.75rem 1rem;
+    padding: 0.8rem 1rem;
+    box-shadow: 0 8px 24px rgba(124,58,237,0.28);
 }
 
-.note-box {
-    background: rgba(255,255,255,0.08);
-    border-left: 5px solid #7c3aed;
-    padding: 1rem;
-    border-radius: 14px;
-    color: #e5e7eb;
-    margin-top: 1rem;
+.stButton>button:hover,
+.stDownloadButton>button:hover,
+div[data-testid="stFormSubmitButton"] button:hover {
+    color: white;
 }
 
 .recommend-box {
@@ -113,10 +176,19 @@ div[data-testid="stFormSubmitButton"] button {
 
 .report-box {
     background: rgba(255,255,255,0.07);
-    border: 1px solid rgba(255,255,255,0.09);
+    border: 1px solid rgba(255,255,255,0.08);
     padding: 1rem;
     border-radius: 16px;
     color: white;
+}
+
+.note-box {
+    background: rgba(255,255,255,0.08);
+    border-left: 5px solid #7c3aed;
+    padding: 1rem;
+    border-radius: 14px;
+    color: #e5e7eb;
+    margin-top: 1rem;
 }
 
 .footer-text {
@@ -126,22 +198,28 @@ div[data-testid="stFormSubmitButton"] button {
     margin-top: 1rem;
 }
 
-h1, h2, h3, p, label {
+h1, h2, h3, h4, p, label {
     color: white !important;
 }
 </style>
 """, unsafe_allow_html=True)
 
-# ---------- INTRO ----------
+# ---------- INTRO OVERLAY ----------
 st.markdown("""
 <div class="intro">
-    <div class="intro-text">✨ Welcome to Diabetes Analyzer</div>
+    <div class="intro-box">
+        <div class="intro-text">✨ Welcome to Diabetes Analyzer</div>
+        <div class="intro-sub">Smart ML-based diabetes risk prediction system</div>
+    </div>
 </div>
 """, unsafe_allow_html=True)
 
 # ---------- HEADER ----------
-st.title("🩺 Diabetes Prediction System")
-st.caption("Enter patient details to predict diabetes risk and generate a patient report.")
+st.markdown('<div class="main-title">🩺 Diabetes Prediction System</div>', unsafe_allow_html=True)
+st.markdown(
+    '<div class="main-subtitle">Enter patient details to predict diabetes risk and generate a patient report.</div>',
+    unsafe_allow_html=True
+)
 
 # ---------- LAYOUT ----------
 left, right = st.columns([1.2, 1])
