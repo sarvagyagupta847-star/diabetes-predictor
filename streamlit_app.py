@@ -1,16 +1,18 @@
 import streamlit as st
 import pickle
 import numpy as np
+from datetime import datetime
 
 st.set_page_config(page_title="Diabetes Predictor", page_icon="🩺", layout="wide")
 
 @st.cache_resource
 def load_model():
-    return pickle.load(open("model.pkl", "rb"))
+    with open("model.pkl", "rb") as f:
+        return pickle.load(f)
 
 model = load_model()
 
-# ---------- UI STYLE ----------
+# ---------- Styling ----------
 st.markdown("""
 <style>
 [data-testid="stAppViewContainer"] {
@@ -32,6 +34,7 @@ st.markdown("""
     padding: 2rem;
     border-radius: 20px;
     border: 1px solid rgba(255,255,255,0.1);
+    margin-bottom: 1rem;
 }
 .metric {
     background: rgba(255,255,255,0.06);
@@ -45,43 +48,52 @@ st.markdown("""
     font-weight: bold;
     color: #38bdf8;
 }
-.stButton>button {
+.stButton>button, .stDownloadButton>button {
     width: 100%;
     background: linear-gradient(90deg,#2563eb,#38bdf8);
     color: white;
     font-weight: bold;
     border-radius: 12px;
+    border: none;
+    padding: 0.7rem 1rem;
+}
+.report-box {
+    background: rgba(255,255,255,0.08);
+    padding: 1.2rem;
+    border-radius: 14px;
+    color: white;
+    border: 1px solid rgba(255,255,255,0.08);
+}
+.small-note {
+    color: #cbd5e1;
+    font-size: 0.92rem;
 }
 </style>
 """, unsafe_allow_html=True)
 
-# ---------- HEADER ----------
 st.markdown('<div class="main-title">🩺 Diabetes Prediction System</div>', unsafe_allow_html=True)
-st.markdown('<div class="sub-title">Enter patient details to predict diabetes risk</div>', unsafe_allow_html=True)
+st.markdown('<div class="sub-title">Enter patient details to predict diabetes risk and generate a patient report</div>', unsafe_allow_html=True)
 
-# ---------- LAYOUT ----------
-left, right = st.columns([1.2,1])
+left, right = st.columns([1.25, 1])
 
 with left:
     st.markdown('<div class="glass-card">', unsafe_allow_html=True)
-
     st.subheader("Patient Details")
 
-    # 🔥 NEW: Patient Name
-    name = st.text_input("Patient Name")
+    with st.form("patient_form"):
+        name = st.text_input("Patient Name", placeholder="Enter full name")
+        col1, col2 = st.columns(2)
 
-    col1, col2 = st.columns(2)
+        with col1:
+            age = st.number_input("Age", min_value=1, max_value=120, value=25, step=1)
+            bp = st.number_input("Blood Pressure", min_value=0.0, value=80.0, step=1.0)
+            glucose = st.number_input("Glucose", min_value=0.0, value=100.0, step=1.0)
 
-    with col1:
-        age = st.number_input("Age", 1, 120)
-        bp = st.number_input("Blood Pressure")
-        glucose = st.number_input("Glucose")
+        with col2:
+            bmi = st.number_input("BMI", min_value=0.0, value=24.5, step=0.1, format="%.1f")
+            insulin = st.number_input("Insulin", min_value=0.0, value=80.0, step=1.0)
 
-    with col2:
-        bmi = st.number_input("BMI")
-        insulin = st.number_input("Insulin")
-
-    predict = st.button("Predict")
+        submitted = st.form_submit_button("Predict and Generate Report")
 
     st.markdown('</div>', unsafe_allow_html=True)
 
@@ -90,52 +102,108 @@ with right:
     st.subheader("Health Snapshot")
 
     m1, m2 = st.columns(2)
-
     with m1:
         st.markdown(f'<div class="metric"><div>Age</div><div class="metric-value">{age}</div></div>', unsafe_allow_html=True)
     with m2:
         st.markdown(f'<div class="metric"><div>BMI</div><div class="metric-value">{bmi}</div></div>', unsafe_allow_html=True)
 
     m3, m4 = st.columns(2)
-
     with m3:
         st.markdown(f'<div class="metric"><div>Glucose</div><div class="metric-value">{glucose}</div></div>', unsafe_allow_html=True)
     with m4:
         st.markdown(f'<div class="metric"><div>BP</div><div class="metric-value">{bp}</div></div>', unsafe_allow_html=True)
 
-    # 🔥 NEW: Risk Level Indicator
-    avg = (glucose + bmi + bp) / 3 if (glucose + bmi + bp) != 0 else 0
-
+    avg = (glucose + bmi + bp) / 3 if (glucose + bmi + bp) > 0 else 0
     st.markdown("### Risk Indicator")
-
     if avg > 120:
         st.error("High Risk Zone")
     elif avg > 80:
-        st.warning("Moderate Risk")
+        st.warning("Moderate Risk Zone")
     else:
-        st.success("Low Risk")
+        st.success("Low Risk Zone")
 
     st.markdown('</div>', unsafe_allow_html=True)
 
-# ---------- PREDICTION ----------
-if predict:
+# Keep results in session_state so download works after rerun
+if "report_text" not in st.session_state:
+    st.session_state.report_text = None
+
+if submitted:
     data = np.array([[age, bp, glucose, bmi, insulin]])
     prediction = model.predict(data)[0]
 
-    st.markdown("## Result")
-
-    # 🔥 Show patient name in result
-    if name:
-        st.write(f"Patient: **{name}**")
+    risk_score = None
+    if hasattr(model, "predict_proba"):
+        risk_score = model.predict_proba(data)[0][1] * 100
 
     if prediction == 1:
-        st.error("⚠️ High chance of Diabetes")
+        result_text = "High chance of diabetes detected"
+        result_short = "HIGH RISK"
     else:
-        st.success("✅ Low chance of Diabetes")
+        result_text = "Low chance of diabetes detected"
+        result_short = "LOW RISK"
 
-    if hasattr(model, "predict_proba"):
-        prob = model.predict_proba(data)[0][1] * 100
-        st.info(f"Risk Score: {prob:.2f}%")
+    patient_name = name.strip() if name.strip() else "Unknown Patient"
+    report_date = datetime.now().strftime("%d/%m/%Y %H:%M")
 
-# ---------- FOOTER ----------
-st.markdown("This tool is for educational purposes only.")
+    report = f"""
+DIABETES PREDICTION PATIENT REPORT
+----------------------------------
+
+Patient Name: {patient_name}
+Date & Time: {report_date}
+
+Entered Health Values
+---------------------
+Age: {age}
+Blood Pressure: {bp}
+Glucose: {glucose}
+BMI: {bmi}
+Insulin: {insulin}
+
+Prediction Result
+-----------------
+Status: {result_short}
+Interpretation: {result_text}
+"""
+
+    if risk_score is not None:
+        report += f"Estimated Risk Score: {risk_score:.2f}%\n"
+
+    report += """
+Important Note
+--------------
+This report is generated by a machine learning model for awareness and educational purposes only.
+It does not replace professional medical diagnosis or treatment advice.
+"""
+
+    st.session_state.report_text = report
+
+    st.markdown("## Prediction Result")
+    st.write(f"**Patient Name:** {patient_name}")
+
+    if prediction == 1:
+        st.error(f"⚠️ {result_text}")
+    else:
+        st.success(f"✅ {result_text}")
+
+    if risk_score is not None:
+        st.info(f"Estimated diabetes risk score: {risk_score:.2f}%")
+
+if st.session_state.report_text:
+    st.markdown("## Patient Report")
+    st.markdown('<div class="report-box">', unsafe_allow_html=True)
+    st.text(st.session_state.report_text)
+    st.markdown('</div>', unsafe_allow_html=True)
+
+    st.download_button(
+        label="Download Patient Report",
+        data=st.session_state.report_text,
+        file_name="patient_report.txt",
+        mime="text/plain"
+    )
+
+st.markdown(
+    '<p class="small-note">This tool uses machine learning for awareness and educational purposes. Please consult a doctor for medical advice.</p>',
+    unsafe_allow_html=True
+)
