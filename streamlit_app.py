@@ -237,43 +237,42 @@ with left:
 
         with col1:
             age = st.number_input(
-                "Age",
-                min_value=1,
-                max_value=120,
-                value=30,
-                help="Typical adult range: 18–65"
-            )
-            bp = st.number_input(
-                "Blood Pressure (mmHg)",
-                min_value=0.0,
-                value=80.0,
-                step=1.0,
-                help="Normal range: 70–120 mmHg"
-            )
-            glucose = st.number_input(
-                "Glucose (mg/dL)",
-                min_value=0.0,
-                value=100.0,
-                step=1.0,
-                help="Normal fasting range: 70–100 mg/dL"
-            )
+    "Age (1–120 years)",
+    min_value=1,
+    max_value=120,
+    value=30
+)
+           bp = st.number_input(
+    "Blood Pressure (70–120 mmHg)",
+    min_value=70.0,
+    max_value=200.0,
+    value=80.0,
+    step=1.0
+)
+glucose = st.number_input(
+    "Glucose (70–100 mg/dL normal)",
+    min_value=50.0,
+    max_value=300.0,
+    value=100.0,
+    step=1.0
+)
 
         with col2:
-            bmi = st.number_input(
-                "BMI",
-                min_value=0.0,
-                value=24.5,
-                step=0.1,
-                format="%.1f",
-                help="Normal range: 18.5–24.9"
-            )
+     bmi = st.number_input(
+    "BMI (18.5–24.9 normal)",
+    min_value=10.0,
+    max_value=50.0,
+    value=24.5,
+    step=0.1
+)
+            
             insulin = st.number_input(
-                "Insulin",
-                min_value=0.0,
-                value=80.0,
-                step=1.0,
-                help="Typical range: 16–166"
-            )
+    "Insulin (16–166 normal)",
+    min_value=0.0,
+    max_value=300.0,
+    value=80.0,
+    step=1.0
+)
 
         submitted = st.form_submit_button("Predict and Generate Report")
 
