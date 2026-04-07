@@ -1,81 +1,437 @@
-st.subheader("What to Do Next")
+import streamlit as st
+import pickle
+import numpy as np
+from datetime import datetime
 
-if prediction == 1:
+st.set_page_config(page_title="Diabetes Analyzer", page_icon="🩺", layout="wide")
 
-    # 🔴 HIGH RISK
-    st.markdown("""
-    <div class="recommend-box">
-    <b>⚠️ High Risk – Recommended Actions:</b><br><br>
-    • Consult a doctor immediately<br>
-    • Monitor blood sugar regularly<br>
-    • Reduce sugar intake<br>
-    • Focus on weight management<br>
-    </div>
-    """, unsafe_allow_html=True)
+# ---------- LOAD MODEL ----------
+@st.cache_resource
+def load_model():
+    with open("model.pkl", "rb") as f:
+        return pickle.load(f)
 
-    # 🍎 DIET TIPS
-    st.subheader("🍎 Diet Tips")
+model = load_model()
 
-    st.markdown("""
-    <div class="recommend-box">
-    <b>Eat:</b><br>
-    • Green vegetables (spinach, broccoli)<br>
-    • Whole grains (brown rice, oats)<br>
-    • Protein (eggs, paneer, dal, chicken)<br>
-    • Nuts and seeds<br><br>
+# ---------- CSS ----------
+st.markdown("""
+<style>
+[data-testid="stAppViewContainer"] {
+    background: linear-gradient(135deg, #1a0f2e, #2a1b4d, #102542);
+    background-attachment: fixed;
+}
 
-    <b>Avoid:</b><br>
-    • Sugary drinks and sweets<br>
-    • Fried and junk food<br>
-    • Refined carbs (maida, white bread)<br>
-    </div>
-    """, unsafe_allow_html=True)
+[data-testid="stHeader"] {
+    background: rgba(0,0,0,0);
+}
 
-    # 🏃 EXERCISE TIPS
-    st.subheader("🏃 Exercise Tips")
+/* FULL PAGE INTRO */
+@keyframes splash {
+    0% {opacity: 1;}
+    80% {opacity: 1;}
+    100% {opacity: 0; visibility: hidden;}
+}
 
-    st.markdown("""
-    <div class="recommend-box">
-    • Walk at least 30 minutes daily<br>
-    • Do light jogging or cycling<br>
-    • Try yoga or stretching exercises<br>
-    • Avoid sitting for long hours<br>
-    • Do regular physical activity (5 days/week)<br>
-    </div>
-    """, unsafe_allow_html=True)
+.intro {
+    position: fixed;
+    inset: 0;
+    backdrop-filter: blur(18px);
+    background: rgba(0, 0, 0, 0.25);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+    animation: splash 3.5s forwards;
+}
 
-else:
+.intro-text {
+    font-size: 3rem;
+    font-weight: bold;
+    color: white;
+    text-align: center;
+    padding: 1.2rem 2rem;
+    border-radius: 24px;
+    background: rgba(255,255,255,0.08);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+}
 
-    # 🟢 LOW RISK
-    st.markdown("""
-    <div class="recommend-box">
-    <b>✅ Low Risk – Maintain Healthy Lifestyle:</b><br><br>
-    • Continue healthy habits<br>
-    • Regular exercise<br>
-    • Balanced diet<br>
-    </div>
-    """, unsafe_allow_html=True)
+/* MAIN UI */
+.glass-card {
+    background: rgba(255,255,255,0.08);
+    padding: 2rem;
+    border-radius: 20px;
+    border: 1px solid rgba(255,255,255,0.08);
+    margin-bottom: 1rem;
+}
 
-    # 🍎 DIET TIPS
-    st.subheader("🍎 Healthy Diet Tips")
+.metric {
+    background: rgba(255,255,255,0.06);
+    padding: 1rem;
+    border-radius: 15px;
+    text-align: center;
+    color: white;
+    margin-bottom: 10px;
+    border: 1px solid rgba(255,255,255,0.05);
+}
 
-    st.markdown("""
-    <div class="recommend-box">
-    • Eat fresh fruits and vegetables<br>
-    • Drink enough water<br>
-    • Avoid excess sugar<br>
-    • Prefer home-cooked meals<br>
-    </div>
-    """, unsafe_allow_html=True)
+.metric-value {
+    font-size: 1.7rem;
+    color: #38bdf8;
+    font-weight: bold;
+    margin-top: 0.25rem;
+}
 
-    # 🏃 EXERCISE TIPS
-    st.subheader("🏃 Exercise Tips")
+.stButton>button,
+.stDownloadButton>button,
+div[data-testid="stFormSubmitButton"] button {
+    width: 100%;
+    background: linear-gradient(90deg,#7c3aed,#06b6d4);
+    color: white;
+    font-weight: bold;
+    border-radius: 12px;
+    border: none;
+    padding: 0.75rem 1rem;
+}
 
-    st.markdown("""
-    <div class="recommend-box">
-    • Walk 20–30 minutes daily<br>
-    • Stay physically active<br>
-    • Do yoga or stretching<br>
-    • Avoid sedentary lifestyle<br>
-    </div>
-    """, unsafe_allow_html=True)
+.note-box {
+    background: rgba(255,255,255,0.08);
+    border-left: 5px solid #7c3aed;
+    padding: 1rem;
+    border-radius: 14px;
+    color: #e5e7eb;
+    margin-top: 1rem;
+}
+
+.recommend-box {
+    background: rgba(255,255,255,0.08);
+    border-left: 5px solid #38bdf8;
+    padding: 1rem;
+    border-radius: 14px;
+    color: #e5e7eb;
+    margin-top: 0.8rem;
+}
+
+.report-box {
+    background: rgba(255,255,255,0.07);
+    border: 1px solid rgba(255,255,255,0.09);
+    padding: 1rem;
+    border-radius: 16px;
+    color: white;
+}
+
+.footer-text {
+    text-align: center;
+    color: #cbd5e1;
+    font-size: 0.92rem;
+    margin-top: 1rem;
+}
+
+h1, h2, h3, p, label {
+    color: white !important;
+}
+</style>
+""", unsafe_allow_html=True)
+
+# ---------- INTRO ----------
+st.markdown("""
+<div class="intro">
+    <div class="intro-text">✨ Welcome to Diabetes Analyzer</div>
+</div>
+""", unsafe_allow_html=True)
+
+# ---------- HEADER ----------
+st.title("🩺 Diabetes Prediction System")
+st.caption("Enter patient details to predict diabetes risk and generate a patient report.")
+
+# ---------- LAYOUT ----------
+left, right = st.columns([1.2, 1])
+
+with left:
+    st.markdown('<div class="glass-card">', unsafe_allow_html=True)
+    st.subheader("Patient Details")
+
+    with st.form("patient_form"):
+        name = st.text_input("Patient Name", placeholder="Enter full name")
+
+        col1, col2 = st.columns(2)
+
+        with col1:
+            age = st.number_input(
+                "Age (1–120 years)",
+                min_value=1,
+                max_value=120,
+                value=30,
+                step=1
+            )
+
+            bp = st.number_input(
+                "Blood Pressure (70–120 mmHg normal)",
+                min_value=70.0,
+                max_value=200.0,
+                value=80.0,
+                step=1.0
+            )
+
+            glucose = st.number_input(
+                "Glucose (70–100 mg/dL fasting normal)",
+                min_value=50.0,
+                max_value=300.0,
+                value=100.0,
+                step=1.0
+            )
+
+        with col2:
+            bmi = st.number_input(
+                "BMI (18.5–24.9 normal)",
+                min_value=10.0,
+                max_value=50.0,
+                value=24.5,
+                step=0.1
+            )
+
+            insulin = st.number_input(
+                "Insulin (16–166 typical range)",
+                min_value=0.0,
+                max_value=300.0,
+                value=80.0,
+                step=1.0
+            )
+
+        submitted = st.form_submit_button("Predict and Generate Report")
+
+    st.markdown('</div>', unsafe_allow_html=True)
+
+with right:
+    st.markdown('<div class="glass-card">', unsafe_allow_html=True)
+    st.subheader("Health Snapshot")
+
+    st.markdown(
+        f'<div class="metric">Age<div class="metric-value">{age}</div></div>',
+        unsafe_allow_html=True
+    )
+    st.markdown(
+        f'<div class="metric">BMI<div class="metric-value">{bmi}</div></div>',
+        unsafe_allow_html=True
+    )
+    st.markdown(
+        f'<div class="metric">Glucose<div class="metric-value">{glucose}</div></div>',
+        unsafe_allow_html=True
+    )
+    st.markdown(
+        f'<div class="metric">Blood Pressure<div class="metric-value">{bp}</div></div>',
+        unsafe_allow_html=True
+    )
+    st.markdown(
+        f'<div class="metric">Insulin<div class="metric-value">{insulin}</div></div>',
+        unsafe_allow_html=True
+    )
+
+    avg = (glucose + bmi + bp) / 3
+
+    st.subheader("Risk Indicator")
+    if avg > 120:
+        st.error("High Risk Zone")
+    elif avg > 80:
+        st.warning("Moderate Risk Zone")
+    else:
+        st.success("Low Risk Zone")
+
+    st.markdown('</div>', unsafe_allow_html=True)
+
+# ---------- STATE ----------
+if "report_text" not in st.session_state:
+    st.session_state.report_text = None
+
+# ---------- PREDICTION ----------
+if submitted:
+    data = np.array([[age, bp, glucose, bmi, insulin]])
+    prediction = model.predict(data)[0]
+
+    patient_name = name.strip() if name.strip() else "Unknown Patient"
+    result = "HIGH RISK" if prediction == 1 else "LOW RISK"
+
+    risk_score = None
+    if hasattr(model, "predict_proba"):
+        try:
+            risk_score = model.predict_proba(data)[0][1] * 100
+        except Exception:
+            risk_score = None
+
+    st.subheader("Result")
+    st.write(f"Patient: **{patient_name}**")
+
+    if prediction == 1:
+        st.error("⚠️ High chance of Diabetes")
+    else:
+        st.success("✅ Low chance of Diabetes")
+
+    if risk_score is not None:
+        st.info(f"Estimated diabetes risk score: {risk_score:.2f}%")
+
+    # ---------- WHAT TO DO NEXT ----------
+    st.subheader("What to Do Next")
+
+    if prediction == 1:
+        st.markdown("""
+        <div class="recommend-box">
+        <b>⚠️ High Risk – Recommended Actions:</b><br><br>
+        • Consult a doctor for proper diagnosis<br>
+        • Monitor blood sugar regularly<br>
+        • Reduce sugar intake<br>
+        • Focus on weight management<br>
+        • Stay physically active regularly<br>
+        </div>
+        """, unsafe_allow_html=True)
+
+        st.subheader("🍎 Diet Tips")
+        st.markdown("""
+        <div class="recommend-box">
+        <b>Eat:</b><br>
+        • Green vegetables (spinach, broccoli, cucumber)<br>
+        • Whole grains (brown rice, oats, whole wheat)<br>
+        • Protein (eggs, paneer, dal, chicken, fish)<br>
+        • Nuts and seeds in moderation<br><br>
+
+        <b>Avoid:</b><br>
+        • Sugary drinks and sweets<br>
+        • Fried and junk food<br>
+        • Excess white bread, maida, bakery foods<br>
+        • Large portions of high-carb food<br>
+        </div>
+        """, unsafe_allow_html=True)
+
+        st.subheader("🏃 Exercise Tips")
+        st.markdown("""
+        <div class="recommend-box">
+        • Walk at least 30 minutes daily<br>
+        • Do light jogging or cycling if comfortable<br>
+        • Try yoga or stretching exercises<br>
+        • Avoid sitting for very long hours<br>
+        • Aim for regular activity at least 5 days a week<br>
+        </div>
+        """, unsafe_allow_html=True)
+
+    else:
+        st.markdown("""
+        <div class="recommend-box">
+        <b>✅ Low Risk – Maintain Healthy Lifestyle:</b><br><br>
+        • Continue healthy eating habits<br>
+        • Stay physically active<br>
+        • Maintain healthy body weight<br>
+        • Get regular health checkups<br>
+        </div>
+        """, unsafe_allow_html=True)
+
+        st.subheader("🍎 Healthy Diet Tips")
+        st.markdown("""
+        <div class="recommend-box">
+        • Eat fresh fruits and vegetables regularly<br>
+        • Prefer home-cooked balanced meals<br>
+        • Drink enough water<br>
+        • Avoid too much sugar and processed food<br>
+        </div>
+        """, unsafe_allow_html=True)
+
+        st.subheader("🏃 Exercise Tips")
+        st.markdown("""
+        <div class="recommend-box">
+        • Walk 20–30 minutes daily<br>
+        • Stay physically active throughout the day<br>
+        • Do stretching, yoga, or light exercise<br>
+        • Avoid sedentary lifestyle<br>
+        </div>
+        """, unsafe_allow_html=True)
+
+    # ---------- REPORT ----------
+    report = f"""
+DIABETES REPORT
+----------------
+Name: {patient_name}
+Date: {datetime.now().strftime("%d/%m/%Y %H:%M")}
+
+Age: {age}
+Blood Pressure: {bp}
+Glucose: {glucose}
+BMI: {bmi}
+Insulin: {insulin}
+
+Result: {result}
+"""
+
+    if risk_score is not None:
+        report += f"Estimated Risk Score: {risk_score:.2f}%\n"
+
+    if prediction == 1:
+        report += """
+Suggested Next Steps:
+- Consult a doctor for proper diagnosis
+- Monitor blood sugar regularly
+- Reduce sugary foods and drinks
+- Improve diet and activity level
+
+Diet Tips:
+- Eat vegetables, whole grains, and protein
+- Avoid junk food, sweets, and refined carbs
+
+Exercise Tips:
+- Walk 30 minutes daily
+- Try cycling, yoga, or light jogging
+"""
+    else:
+        report += """
+Suggested Next Steps:
+- Continue healthy habits
+- Maintain regular checkups
+- Stay active and hydrated
+
+Diet Tips:
+- Eat balanced home-cooked meals
+- Limit excess sugar and processed food
+
+Exercise Tips:
+- Walk 20–30 minutes daily
+- Stay active and avoid sitting too long
+"""
+
+    report += """
+Important Note:
+This tool is for awareness and educational use only.
+It does not replace medical diagnosis or treatment advice.
+"""
+
+    st.session_state.report_text = report
+
+# ---------- REPORT DISPLAY ----------
+if st.session_state.report_text:
+    st.subheader("Patient Report")
+    st.markdown('<div class="report-box">', unsafe_allow_html=True)
+    st.text(st.session_state.report_text)
+    st.markdown('</div>', unsafe_allow_html=True)
+
+    st.download_button(
+        label="Download Patient Report",
+        data=st.session_state.report_text,
+        file_name="patient_report.txt",
+        mime="text/plain"
+    )
+
+# ---------- FOOTER ----------
+st.info("""
+Reference ranges:
+- Blood Pressure: 70–120 mmHg
+- Glucose (fasting): 70–100 mg/dL
+- BMI: 18.5–24.9
+- Insulin: 16–166
+""")
+
+st.markdown("""
+<div class="note-box">
+<b>Note:</b> This app is for awareness and educational purposes only.
+It should support healthcare decisions, not replace a doctor's diagnosis.
+</div>
+""", unsafe_allow_html=True)
+
+st.markdown(
+    '<div class="footer-text">Built with Streamlit + Machine Learning + Decision Tree Model</div>',
+    unsafe_allow_html=True
+)
