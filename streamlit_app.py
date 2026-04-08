@@ -16,13 +16,9 @@ model = load_model()
 # ---------- CSS ----------
 st.markdown("""
 <style>
-/* ================================
-   GLOBAL BACKGROUND
-================================ */
+/* ---------- BACKGROUND ---------- */
 [data-testid="stAppViewContainer"] {
-    background: linear-gradient(-45deg, #0f172a, #1e1b4b, #0f766e, #7c3aed, #1d4ed8);
-    background-size: 400% 400%;
-    animation: gradientFlow 15s ease infinite;
+    background: linear-gradient(135deg, #0b1020, #16213e, #1b2a49);
     background-attachment: fixed;
 }
 
@@ -30,45 +26,41 @@ st.markdown("""
     background: rgba(0,0,0,0);
 }
 
-@keyframes gradientFlow {
-    0% {background-position: 0% 50%;}
-    50% {background-position: 100% 50%;}
-    100% {background-position: 0% 50%;}
-}
-
-/* ================================
-   INTRO SCREEN
-================================ */
+/* ---------- ANIMATIONS ---------- */
 @keyframes fadeOut {
     0% {opacity: 1;}
-    82% {opacity: 1;}
+    80% {opacity: 1;}
     100% {opacity: 0; visibility: hidden;}
 }
 
 @keyframes glowPulse {
     0% {
         opacity: 0;
-        transform: scale(0.85);
-        text-shadow: 0 0 0px rgba(255,255,255,0);
+        transform: scale(0.88);
+        text-shadow: 0 0 0px rgba(56, 189, 248, 0.0);
     }
-    50% {
+    30% {
         opacity: 1;
-        transform: scale(1.08);
-        text-shadow:
-            0 0 20px #38bdf8,
-            0 0 40px #7c3aed,
-            0 0 60px #06b6d4;
+        transform: scale(1.02);
+        text-shadow: 0 0 12px rgba(56, 189, 248, 0.6),
+                     0 0 24px rgba(56, 189, 248, 0.5);
+    }
+    60% {
+        opacity: 1;
+        transform: scale(1.06);
+        text-shadow: 0 0 24px rgba(56, 189, 248, 0.9),
+                     0 0 50px rgba(56, 189, 248, 0.8),
+                     0 0 80px rgba(124, 58, 237, 0.55);
     }
     100% {
         opacity: 1;
         transform: scale(1);
-        text-shadow:
-            0 0 10px #38bdf8,
-            0 0 25px #7c3aed;
+        text-shadow: 0 0 14px rgba(56, 189, 248, 0.7),
+                     0 0 28px rgba(124, 58, 237, 0.35);
     }
 }
 
-@keyframes softRise {
+@keyframes subtitleRise {
     0% {
         opacity: 0;
         transform: translateY(25px);
@@ -79,97 +71,18 @@ st.markdown("""
     }
 }
 
-@keyframes floatBox {
+@keyframes floatCard {
     0% {transform: translateY(0px);}
     50% {transform: translateY(-8px);}
     100% {transform: translateY(0px);}
 }
 
-.intro {
-    position: fixed;
-    inset: 0;
-    z-index: 99999;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: rgba(3, 7, 18, 0.50);
-    backdrop-filter: blur(24px);
-    animation: fadeOut 4s forwards;
+@keyframes floatMetric {
+    0% {transform: translateY(0px);}
+    50% {transform: translateY(-4px);}
+    100% {transform: translateY(0px);}
 }
 
-.intro-box {
-    text-align: center;
-    padding: 2.5rem 3rem;
-    border-radius: 32px;
-    background: rgba(255,255,255,0.10);
-    border: 1px solid rgba(255,255,255,0.15);
-    box-shadow: 0 20px 60px rgba(0,0,0,0.40);
-    animation: floatBox 3s ease-in-out infinite;
-}
-
-.intro-text {
-    font-size: 3.2rem;
-    font-weight: 900;
-    color: white;
-    letter-spacing: 1px;
-    animation: glowPulse 2s ease-in-out;
-}
-
-.intro-sub {
-    margin-top: 0.75rem;
-    color: #dbeafe;
-    font-size: 1.08rem;
-    animation: softRise 1.2s ease-in-out;
-}
-
-/* ================================
-   MAIN TITLE
-================================ */
-@keyframes shimmer {
-    0% {background-position: -200% center;}
-    100% {background-position: 200% center;}
-}
-
-.main-title {
-    font-size: 2.9rem;
-    font-weight: 900;
-    margin-bottom: 0.25rem;
-    background: linear-gradient(90deg, #ffffff, #67e8f9, #c4b5fd, #f9a8d4, #ffffff);
-    background-size: 200% auto;
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    animation: shimmer 6s linear infinite;
-}
-
-.main-subtitle {
-    color: #e2e8f0;
-    font-size: 1.05rem;
-    margin-bottom: 1.3rem;
-    animation: softRise 1s ease-in-out;
-}
-
-/* ================================
-   HEARTBEAT LINE
-================================ */
-@keyframes heartbeatMove {
-    0% {background-position: 0% 50%;}
-    100% {background-position: 200% 50%;}
-}
-
-.heartbeat-line {
-    height: 5px;
-    width: 100%;
-    border-radius: 999px;
-    background: linear-gradient(90deg, #22d3ee, #a78bfa, #f472b6, #22d3ee);
-    background-size: 200% 100%;
-    animation: heartbeatMove 3s linear infinite;
-    margin: 0.6rem 0 1.4rem 0;
-    box-shadow: 0 0 18px rgba(56,189,248,0.5);
-}
-
-/* ================================
-   CARDS
-================================ */
 @keyframes fadeSlideUp {
     0% {
         opacity: 0;
@@ -181,122 +94,219 @@ st.markdown("""
     }
 }
 
-.glass-card {
-    background: rgba(255,255,255,0.10);
-    padding: 2rem;
-    border-radius: 24px;
+@keyframes shimmer {
+    0% {background-position: -200% center;}
+    100% {background-position: 200% center;}
+}
+
+@keyframes pulseButton {
+    0% {box-shadow: 0 0 0 rgba(124,58,237,0.0);}
+    50% {box-shadow: 0 0 22px rgba(124,58,237,0.45);}
+    100% {box-shadow: 0 0 0 rgba(124,58,237,0.0);}
+}
+
+@keyframes resultPop {
+    0% {
+        opacity: 0;
+        transform: scale(0.92);
+    }
+    100% {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+/* ---------- HEARTBEAT LINE ---------- */
+@keyframes heartbeatMove {
+    0% {
+        background-position: 0% 50%;
+        transform: scaleX(1);
+    }
+    25% {
+        transform: scaleY(1.4);
+    }
+    50% {
+        background-position: 100% 50%;
+        transform: scaleY(1);
+    }
+    75% {
+        transform: scaleY(1.4);
+    }
+    100% {
+        background-position: 200% 50%;
+        transform: scaleY(1);
+    }
+}
+
+.heartbeat-line {
+    width: 100%;
+    height: 6px;
+    border-radius: 999px;
+    background: linear-gradient(90deg, #06b6d4, #38bdf8, #a855f7, #ec4899, #06b6d4);
+    background-size: 200% 100%;
+    animation: heartbeatMove 2.8s linear infinite;
+    margin: 0.4rem 0 1.5rem 0;
+    box-shadow: 0 0 18px rgba(56, 189, 248, 0.45);
+}
+
+/* ---------- FULL SCREEN INTRO ---------- */
+.intro {
+    position: fixed;
+    inset: 0;
+    backdrop-filter: blur(22px);
+    background: rgba(2, 6, 23, 0.58);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+    animation: fadeOut 3.8s forwards;
+}
+
+.intro-box {
+    text-align: center;
+    padding: 2rem 2.5rem;
+    border-radius: 26px;
+    background: rgba(255,255,255,0.08);
     border: 1px solid rgba(255,255,255,0.12);
-    box-shadow: 0 12px 34px rgba(0,0,0,0.22);
+    box-shadow: 0 18px 48px rgba(0,0,0,0.35);
+    animation: floatCard 2.8s ease-in-out infinite;
+}
+
+.intro-text {
+    font-size: 3.1rem;
+    font-weight: 800;
+    color: white;
+    letter-spacing: 1px;
+    animation: glowPulse 2.2s ease-in-out;
+}
+
+.intro-sub {
+    margin-top: 0.7rem;
+    color: #dbeafe;
+    font-size: 1.05rem;
+    animation: subtitleRise 1.2s ease-in-out;
+}
+
+/* ---------- MAIN UI ---------- */
+.main-title {
+    font-size: 2.7rem;
+    font-weight: 800;
+    margin-bottom: 0.2rem;
+    background: linear-gradient(90deg, #ffffff, #7dd3fc, #c4b5fd, #ffffff);
+    background-size: 200% auto;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: shimmer 5s linear infinite;
+}
+
+.main-subtitle {
+    color: #dbeafe;
+    margin-bottom: 1.5rem;
+    font-size: 1.05rem;
+    animation: fadeSlideUp 1.2s ease-in-out;
+}
+
+.glass-card {
+    background: rgba(255,255,255,0.08);
+    padding: 2rem;
+    border-radius: 22px;
+    border: 1px solid rgba(255,255,255,0.09);
+    box-shadow: 0 10px 32px rgba(0,0,0,0.22);
     margin-bottom: 1rem;
-    animation: fadeSlideUp 0.9s ease-in-out;
-    transition: transform 0.35s ease, box-shadow 0.35s ease;
+    animation: fadeSlideUp 0.9s ease-in-out, floatCard 4s ease-in-out infinite;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
 .glass-card:hover {
-    transform: translateY(-8px) scale(1.01);
-    box-shadow: 0 18px 40px rgba(0,0,0,0.28);
+    transform: translateY(-6px);
+    box-shadow: 0 16px 36px rgba(0,0,0,0.28);
 }
 
-/* ================================
-   METRICS
-================================ */
 .metric {
-    background: linear-gradient(135deg, rgba(255,255,255,0.10), rgba(255,255,255,0.06));
+    background: rgba(255,255,255,0.06);
     padding: 1rem;
-    border-radius: 18px;
+    border-radius: 16px;
     text-align: center;
     color: white;
-    margin-bottom: 0.9rem;
-    border: 1px solid rgba(255,255,255,0.08);
-    animation: fadeSlideUp 1s ease-in-out;
-    transition: all 0.28s ease;
+    margin-bottom: 0.8rem;
+    border: 1px solid rgba(255,255,255,0.06);
+    animation: fadeSlideUp 1s ease-in-out, floatMetric 3.2s ease-in-out infinite;
+    transition: transform 0.25s ease, background 0.25s ease;
 }
 
 .metric:hover {
-    transform: scale(1.05);
-    background: linear-gradient(135deg, rgba(125,211,252,0.18), rgba(196,181,253,0.18));
+    transform: scale(1.03);
+    background: rgba(255,255,255,0.1);
 }
 
 .metric-value {
-    font-size: 1.8rem;
-    font-weight: 800;
+    font-size: 1.7rem;
+    color: #67e8f9;
+    font-weight: 700;
     margin-top: 0.25rem;
-    color: #fde68a;
-    text-shadow: 0 0 10px rgba(253,230,138,0.35);
-}
-
-/* ================================
-   BUTTONS
-================================ */
-@keyframes pulseButton {
-    0% {box-shadow: 0 0 0 rgba(124,58,237,0.0);}
-    50% {box-shadow: 0 0 24px rgba(56,189,248,0.45);}
-    100% {box-shadow: 0 0 0 rgba(124,58,237,0.0);}
 }
 
 .stButton>button,
 .stDownloadButton>button,
 div[data-testid="stFormSubmitButton"] button {
     width: 100%;
-    background: linear-gradient(90deg, #ec4899, #7c3aed, #06b6d4);
+    background: linear-gradient(90deg, #7c3aed, #06b6d4);
     color: white;
-    font-weight: 800;
-    border-radius: 16px;
+    font-weight: 700;
+    border-radius: 14px;
     border: none;
-    padding: 0.85rem 1rem;
-    animation: pulseButton 2.3s infinite;
+    padding: 0.8rem 1rem;
+    box-shadow: 0 8px 24px rgba(124,58,237,0.28);
+    animation: pulseButton 2.5s infinite;
     transition: transform 0.2s ease;
 }
 
 .stButton>button:hover,
 .stDownloadButton>button:hover,
 div[data-testid="stFormSubmitButton"] button:hover {
-    transform: scale(1.03);
     color: white;
+    transform: scale(1.02);
 }
 
-/* ================================
-   CONTENT BOXES
-================================ */
 .recommend-box {
-    background: rgba(255,255,255,0.10);
-    border-left: 5px solid #22d3ee;
+    background: rgba(255,255,255,0.08);
+    border-left: 5px solid #38bdf8;
     padding: 1rem;
     border-radius: 14px;
-    color: #f8fafc;
+    color: #e5e7eb;
     margin-top: 0.8rem;
-    animation: fadeSlideUp 0.8s ease-in-out;
+    animation: fadeSlideUp 0.9s ease-in-out;
 }
 
 .report-box {
-    background: rgba(255,255,255,0.09);
-    border: 1px solid rgba(255,255,255,0.10);
+    background: rgba(255,255,255,0.07);
+    border: 1px solid rgba(255,255,255,0.08);
     padding: 1rem;
-    border-radius: 18px;
+    border-radius: 16px;
     color: white;
-    animation: fadeSlideUp 0.7s ease-in-out;
+    animation: resultPop 0.6s ease-in-out;
 }
 
 .note-box {
-    background: rgba(255,255,255,0.10);
-    border-left: 5px solid #f472b6;
+    background: rgba(255,255,255,0.08);
+    border-left: 5px solid #7c3aed;
     padding: 1rem;
     border-radius: 14px;
-    color: #f8fafc;
+    color: #e5e7eb;
     margin-top: 1rem;
     animation: fadeSlideUp 1.1s ease-in-out;
 }
 
 .footer-text {
     text-align: center;
-    color: #e2e8f0;
+    color: #cbd5e1;
     font-size: 0.92rem;
     margin-top: 1rem;
-    animation: softRise 1.4s ease-in-out;
+    animation: fadeSlideUp 1.4s ease-in-out;
 }
 
 .result-wrap {
-    animation: fadeSlideUp 0.6s ease-in-out;
+    animation: resultPop 0.6s ease-in-out;
 }
 
 h1, h2, h3, h4, p, label {
@@ -305,7 +315,7 @@ h1, h2, h3, h4, p, label {
 </style>
 """, unsafe_allow_html=True)
 
-# ---------- INTRO ----------
+# ---------- INTRO OVERLAY ----------
 st.markdown("""
 <div class="intro">
     <div class="intro-box">
@@ -317,7 +327,10 @@ st.markdown("""
 
 # ---------- HEADER ----------
 st.markdown('<div class="main-title">🩺 Diabetes Prediction System</div>', unsafe_allow_html=True)
-st.markdown('<div class="main-subtitle">Enter patient details to predict diabetes risk and generate a patient report.</div>', unsafe_allow_html=True)
+st.markdown(
+    '<div class="main-subtitle">Enter patient details to predict diabetes risk and generate a patient report.</div>',
+    unsafe_allow_html=True
+)
 st.markdown('<div class="heartbeat-line"></div>', unsafe_allow_html=True)
 
 # ---------- LAYOUT ----------
@@ -367,6 +380,7 @@ with right:
 
     st.markdown('</div>', unsafe_allow_html=True)
 
+# ---------- STATE ----------
 if "report_text" not in st.session_state:
     st.session_state.report_text = None
 
@@ -420,6 +434,7 @@ if submitted:
         • Whole grains (brown rice, oats, whole wheat)<br>
         • Protein (eggs, paneer, dal, chicken, fish)<br>
         • Nuts and seeds in moderation<br><br>
+
         <b>Avoid:</b><br>
         • Sugary drinks and sweets<br>
         • Fried and junk food<br>
