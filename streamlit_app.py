@@ -573,7 +573,4 @@ It should support healthcare decisions, not replace a doctor's diagnosis.
 </div>
 """, unsafe_allow_html=True)
 
-st.markdown(
-    '<div class="footer-text">Built with Streamlit + Machine Learning + Decision Tree Model</div>',
-    unsafe_allow_html=True
-)
+
