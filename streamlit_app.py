@@ -26,7 +26,7 @@ st.markdown("""
     background: rgba(0,0,0,0);
 }
 
-/* ---------- FULL SCREEN INTRO ---------- */
+/* ---------- ANIMATIONS ---------- */
 @keyframes fadeOut {
     0% {opacity: 1;}
     80% {opacity: 1;}
@@ -71,6 +71,46 @@ st.markdown("""
     }
 }
 
+@keyframes floatCard {
+    0% {transform: translateY(0px);}
+    50% {transform: translateY(-6px);}
+    100% {transform: translateY(0px);}
+}
+
+@keyframes fadeSlideUp {
+    0% {
+        opacity: 0;
+        transform: translateY(35px);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes shimmer {
+    0% {background-position: -200% center;}
+    100% {background-position: 200% center;}
+}
+
+@keyframes pulseButton {
+    0% {box-shadow: 0 0 0 rgba(124,58,237,0.0);}
+    50% {box-shadow: 0 0 22px rgba(124,58,237,0.45);}
+    100% {box-shadow: 0 0 0 rgba(124,58,237,0.0);}
+}
+
+@keyframes resultPop {
+    0% {
+        opacity: 0;
+        transform: scale(0.92);
+    }
+    100% {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+/* ---------- FULL SCREEN INTRO ---------- */
 .intro {
     position: fixed;
     inset: 0;
@@ -90,6 +130,7 @@ st.markdown("""
     background: rgba(255,255,255,0.08);
     border: 1px solid rgba(255,255,255,0.12);
     box-shadow: 0 18px 48px rgba(0,0,0,0.35);
+    animation: floatCard 2.8s ease-in-out infinite;
 }
 
 .intro-text {
@@ -109,15 +150,21 @@ st.markdown("""
 
 /* ---------- MAIN UI ---------- */
 .main-title {
-    font-size: 2.5rem;
+    font-size: 2.7rem;
     font-weight: 800;
-    color: white;
     margin-bottom: 0.2rem;
+    background: linear-gradient(90deg, #ffffff, #7dd3fc, #c4b5fd, #ffffff);
+    background-size: 200% auto;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: shimmer 5s linear infinite;
 }
 
 .main-subtitle {
     color: #dbeafe;
     margin-bottom: 1.5rem;
+    font-size: 1.05rem;
+    animation: fadeSlideUp 1.2s ease-in-out;
 }
 
 .glass-card {
@@ -127,6 +174,13 @@ st.markdown("""
     border: 1px solid rgba(255,255,255,0.09);
     box-shadow: 0 10px 32px rgba(0,0,0,0.22);
     margin-bottom: 1rem;
+    animation: fadeSlideUp 0.9s ease-in-out;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.glass-card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 16px 36px rgba(0,0,0,0.28);
 }
 
 .metric {
@@ -137,6 +191,13 @@ st.markdown("""
     color: white;
     margin-bottom: 0.8rem;
     border: 1px solid rgba(255,255,255,0.06);
+    animation: fadeSlideUp 1s ease-in-out;
+    transition: transform 0.25s ease, background 0.25s ease;
+}
+
+.metric:hover {
+    transform: scale(1.03);
+    background: rgba(255,255,255,0.1);
 }
 
 .metric-value {
@@ -157,12 +218,15 @@ div[data-testid="stFormSubmitButton"] button {
     border: none;
     padding: 0.8rem 1rem;
     box-shadow: 0 8px 24px rgba(124,58,237,0.28);
+    animation: pulseButton 2.5s infinite;
+    transition: transform 0.2s ease;
 }
 
 .stButton>button:hover,
 .stDownloadButton>button:hover,
 div[data-testid="stFormSubmitButton"] button:hover {
     color: white;
+    transform: scale(1.02);
 }
 
 .recommend-box {
@@ -172,6 +236,7 @@ div[data-testid="stFormSubmitButton"] button:hover {
     border-radius: 14px;
     color: #e5e7eb;
     margin-top: 0.8rem;
+    animation: fadeSlideUp 0.9s ease-in-out;
 }
 
 .report-box {
@@ -180,6 +245,7 @@ div[data-testid="stFormSubmitButton"] button:hover {
     padding: 1rem;
     border-radius: 16px;
     color: white;
+    animation: resultPop 0.6s ease-in-out;
 }
 
 .note-box {
@@ -189,6 +255,7 @@ div[data-testid="stFormSubmitButton"] button:hover {
     border-radius: 14px;
     color: #e5e7eb;
     margin-top: 1rem;
+    animation: fadeSlideUp 1.1s ease-in-out;
 }
 
 .footer-text {
@@ -196,6 +263,11 @@ div[data-testid="stFormSubmitButton"] button:hover {
     color: #cbd5e1;
     font-size: 0.92rem;
     margin-top: 1rem;
+    animation: fadeSlideUp 1.4s ease-in-out;
+}
+
+.result-wrap {
+    animation: resultPop 0.6s ease-in-out;
 }
 
 h1, h2, h3, h4, p, label {
@@ -234,46 +306,13 @@ with left:
         col1, col2 = st.columns(2)
 
         with col1:
-            age = st.number_input(
-                "Age (1–120 years)",
-                min_value=1,
-                max_value=120,
-                value=30,
-                step=1
-            )
-
-            bp = st.number_input(
-                "Blood Pressure (70–120 mmHg normal)",
-                min_value=70.0,
-                max_value=200.0,
-                value=80.0,
-                step=1.0
-            )
-
-            glucose = st.number_input(
-                "Glucose (70–100 mg/dL fasting normal)",
-                min_value=50.0,
-                max_value=300.0,
-                value=100.0,
-                step=1.0
-            )
+            age = st.number_input("Age (1–120 years)", min_value=1, max_value=120, value=30, step=1)
+            bp = st.number_input("Blood Pressure (70–120 mmHg normal)", min_value=70.0, max_value=200.0, value=80.0, step=1.0)
+            glucose = st.number_input("Glucose (70–100 mg/dL fasting normal)", min_value=50.0, max_value=300.0, value=100.0, step=1.0)
 
         with col2:
-            bmi = st.number_input(
-                "BMI (18.5–24.9 normal)",
-                min_value=10.0,
-                max_value=50.0,
-                value=24.5,
-                step=0.1
-            )
-
-            insulin = st.number_input(
-                "Insulin (16–166 typical range)",
-                min_value=0.0,
-                max_value=300.0,
-                value=80.0,
-                step=1.0
-            )
+            bmi = st.number_input("BMI (18.5–24.9 normal)", min_value=10.0, max_value=50.0, value=24.5, step=0.1)
+            insulin = st.number_input("Insulin (16–166 typical range)", min_value=0.0, max_value=300.0, value=80.0, step=1.0)
 
         submitted = st.form_submit_button("Predict and Generate Report")
 
@@ -283,26 +322,11 @@ with right:
     st.markdown('<div class="glass-card">', unsafe_allow_html=True)
     st.subheader("Health Snapshot")
 
-    st.markdown(
-        f'<div class="metric">Age<div class="metric-value">{age}</div></div>',
-        unsafe_allow_html=True
-    )
-    st.markdown(
-        f'<div class="metric">BMI<div class="metric-value">{bmi}</div></div>',
-        unsafe_allow_html=True
-    )
-    st.markdown(
-        f'<div class="metric">Glucose<div class="metric-value">{glucose}</div></div>',
-        unsafe_allow_html=True
-    )
-    st.markdown(
-        f'<div class="metric">Blood Pressure<div class="metric-value">{bp}</div></div>',
-        unsafe_allow_html=True
-    )
-    st.markdown(
-        f'<div class="metric">Insulin<div class="metric-value">{insulin}</div></div>',
-        unsafe_allow_html=True
-    )
+    st.markdown(f'<div class="metric">Age<div class="metric-value">{age}</div></div>', unsafe_allow_html=True)
+    st.markdown(f'<div class="metric">BMI<div class="metric-value">{bmi}</div></div>', unsafe_allow_html=True)
+    st.markdown(f'<div class="metric">Glucose<div class="metric-value">{glucose}</div></div>', unsafe_allow_html=True)
+    st.markdown(f'<div class="metric">Blood Pressure<div class="metric-value">{bp}</div></div>', unsafe_allow_html=True)
+    st.markdown(f'<div class="metric">Insulin<div class="metric-value">{insulin}</div></div>', unsafe_allow_html=True)
 
     avg = (glucose + bmi + bp) / 3
 
@@ -335,6 +359,7 @@ if submitted:
         except Exception:
             risk_score = None
 
+    st.markdown('<div class="result-wrap">', unsafe_allow_html=True)
     st.subheader("Result")
     st.write(f"Patient: **{patient_name}**")
 
@@ -345,8 +370,8 @@ if submitted:
 
     if risk_score is not None:
         st.info(f"Estimated diabetes risk score: {risk_score:.2f}%")
+    st.markdown('</div>', unsafe_allow_html=True)
 
-    # ---------- WHAT TO DO NEXT ----------
     st.subheader("What to Do Next")
 
     if prediction == 1:
@@ -420,7 +445,6 @@ if submitted:
         </div>
         """, unsafe_allow_html=True)
 
-    # ---------- REPORT ----------
     report = f"""
 DIABETES REPORT
 ----------------
